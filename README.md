@@ -1,6 +1,6 @@
 # Qiniu Upload Auth Service
 
-一个基于 FastAPI 的后端服务，通过用户登录后发放七牛云上传凭证。数据库使用 SQLite，并内置管理员用户管理页面。
+一个基于 FastAPI 的后端服务，通过用户登录后发放七牛云上传凭证。默认单机运行使用 SQLite，容器化（docker-compose）运行使用 PostgreSQL，并内置管理员用户管理页面。
 
 ## 功能
 
@@ -65,14 +65,24 @@
 
 设置环境变量 `ADMIN_EMAIL` 与 `ADMIN_PASSWORD`，可通过 `POST /api/bootstrap-admin` 创建管理员。
 
-## Docker 运行
+## Docker 运行（PostgreSQL）
 
-1. 拷贝 `.env.example` 为 `.env` 并填入实际配置。
-2. 启动：
+1. 拷贝 `.env.example` 为 `.env` 并按需修改。关键变量：
+   - `POSTGRES_DB`、`POSTGRES_USER`、`POSTGRES_PASSWORD`：PostgreSQL 初始化配置
+   - `DATABASE_URL`：示例为 `postgresql+psycopg2://postgres:postgres@db:5432/qiniu_auth`（主机名为 compose 服务名 `db`）
+   - `JWT_SECRET_KEY`：请更换为强随机值
+2. 启动服务：
    ```bash
    docker compose up --build -d
    ```
-3. 数据持久化：SQLite 位于容器内 `/app/data/data.db`，已通过卷映射到本地 `./data` 目录。
+3. 访问与验证：
+   - 根路径：`http://localhost:8000/`（返回服务状态）
+   - 管理登录页：`http://localhost:8000/admin/login`
+   - 可执行管理员引导：
+     ```bash
+     curl -X POST http://localhost:8000/api/bootstrap-admin
+     ```
+4. 数据持久化：PostgreSQL 数据位于命名卷 `pgdata` 中；如需本机连接，可使用 `localhost:25432`（用户名/密码与 `.env` 中一致、数据库名为 `POSTGRES_DB`）。
 
 ## 安全与生产建议
 
