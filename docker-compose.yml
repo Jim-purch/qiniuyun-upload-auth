@@ -1,13 +1,13 @@
-version: "3.9"
 services:
   web:
-    build: .
+    build:
+      context: .
     container_name: qiniuyun-upload-auth
     ports:
       - "8000:8000"
     environment:
       - ENV=production
-      - DATABASE_URL=sqlite:///./data/data.db
+      - DATABASE_URL=sqlite:///./data.db
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
       - QINIU_ACCESS_KEY=${QINIU_ACCESS_KEY}
@@ -16,5 +16,5 @@ services:
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     volumes:
-      - ./data:/app/data
+      - ./data.db:/app/data.db
     restart: unless-stopped

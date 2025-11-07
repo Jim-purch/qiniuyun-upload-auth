@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db, engine
-from app.models import User, Base
+from app.models import User, Base, LoginEvent
 from app.schemas import UserCreate, LoginRequest, TokenResponse, UserOut
 from app.auth import get_password_hash, verify_password, create_access_token, get_current_user
 from app.config import settings
@@ -35,7 +35,7 @@ def register(payload: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(payload: LoginRequest, response: Response, db: Session = Depends(get_db)):
+def login(payload: LoginRequest, request: Request, response: Response, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == payload.email).first()
     if not user or not verify_password(payload.password, user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="邮箱或密码错误")
@@ -50,6 +50,16 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
         secure=False,
         samesite="lax",
     )
+    # 记录登录事件
+    try:
+        ip = request.client.host if request.client else None
+        ua = request.headers.get("User-Agent")
+        event = LoginEvent(user_id=user.id, ip=ip, user_agent=ua, success=True)
+        db.add(event)
+        db.commit()
+    except Exception:
+        # 不影响登录流程
+        db.rollback()
     return TokenResponse(access_token=token)
 
 

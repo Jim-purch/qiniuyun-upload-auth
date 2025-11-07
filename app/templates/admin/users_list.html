@@ -7,6 +7,7 @@
       <tr>
         <th>ID</th>
         <th>邮箱</th>
+        <th>最后登录时间</th>
         <th>管理员</th>
         <th>启用</th>
         <th>创建时间</th>
@@ -18,10 +19,12 @@
       <tr>
         <td>{{ u.id }}</td>
         <td>{{ u.email }}</td>
+        <td>{{ last_logins.get(u.id) if last_logins else '' }}</td>
         <td>{{ '是' if u.is_admin else '否' }}</td>
         <td>{{ '是' if u.is_active else '否' }}</td>
         <td>{{ u.created_at }}</td>
         <td>
+          <a href="/admin/users/{{ u.id }}"><button>详情</button></a>
           <a href="/admin/users/edit/{{ u.id }}"><button>编辑</button></a>
           <form method="post" action="/admin/users/delete/{{ u.id }}" style="display:inline;" onsubmit="return confirm('确认删除此用户？');">
             <input type="submit" value="删除" />

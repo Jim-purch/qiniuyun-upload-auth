@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+{% block content %}
+  <h1>{{ title }}</h1>
+  <p>
+    <strong>用户ID：</strong> {{ user.id }}
+    &nbsp;|&nbsp; <strong>邮箱：</strong> {{ user.email }}
+    &nbsp;|&nbsp; <strong>管理员：</strong> {{ '是' if user.is_admin else '否' }}
+    &nbsp;|&nbsp; <strong>启用：</strong> {{ '是' if user.is_active else '否' }}
+  </p>
+  <p>
+    <a href="/admin/users"><button>返回列表</button></a>
+    <a href="/admin/users/{{ user.id }}/login-history.csv?{{ qs_base }}"><button>导出CSV</button></a>
+  </p>
+  <h2>筛选条件</h2>
+  <form method="get" action="/admin/users/{{ user.id }}">
+    <label>开始时间</label>
+    <input type="datetime-local" name="start" value="{{ start_input }}" />
+    <label>结束时间</label>
+    <input type="datetime-local" name="end" value="{{ end_input }}" />
+    <label>IP关键字</label>
+    <input type="text" name="ip" value="{{ ip_kw }}" placeholder="例如：192.168" />
+    <label>每页数量</label>
+    <input type="number" min="5" max="100" name="size" value="{{ size }}" />
+    <input type="submit" value="筛选" />
+  </form>
+  <h2>登录历史</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>时间</th>
+        <th>IP</th>
+        <th>User-Agent</th>
+        <th>成功</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in events %}
+      <tr>
+        <td>{{ e.id }}</td>
+        <td>{{ e.created_at }}</td>
+        <td>{{ e.ip }}</td>
+        <td>{{ e.user_agent }}</td>
+        <td>{{ '是' if e.success else '否' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p>共 {{ total }} 条，页 {{ page }} / {{ total_pages }}</p>
+  <p>
+    {% if page > 1 %}
+      <a href="/admin/users/{{ user.id }}?{{ qs_base }}&page={{ page - 1 }}"><button>上一页</button></a>
+    {% endif %}
+    {% if page < total_pages %}
+      <a href="/admin/users/{{ user.id }}?{{ qs_base }}&page={{ page + 1 }}"><button>下一页</button></a>
+    {% endif %}
+  </p>
+{% endblock %}
