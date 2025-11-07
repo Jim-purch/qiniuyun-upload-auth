@@ -1,12 +1,4 @@
-FROM python:3.9-slim
-
-# Build-time proxy support
-ARG HTTP_PROXY
-ARG HTTPS_PROXY
-ARG NO_PROXY
-ENV HTTP_PROXY=$HTTP_PROXY
-ENV HTTPS_PROXY=$HTTPS_PROXY
-ENV NO_PROXY=$NO_PROXY
+FROM python:3.11-slim
 
 WORKDIR /app
 
@@ -16,8 +8,10 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 COPY . /app
 
 ENV PYTHONUNBUFFERED=1
-# Default sqlite location in container (project root)
-ENV DATABASE_URL=sqlite:///./data.db
+# Default sqlite location in container
+ENV DATABASE_URL=sqlite:///./data/data.db
+
+RUN mkdir -p /app/data
 
 EXPOSE 8000
 

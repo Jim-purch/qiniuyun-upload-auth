@@ -1,13 +1,12 @@
 services:
   web:
-    build:
-      context: .
+    build: .
     container_name: qiniuyun-upload-auth
     ports:
       - "8000:8000"
     environment:
       - ENV=production
-      - DATABASE_URL=sqlite:///./data.db
+      - DATABASE_URL=${DATABASE_URL}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
       - QINIU_ACCESS_KEY=${QINIU_ACCESS_KEY}
@@ -15,6 +14,27 @@ services:
       - QINIU_BUCKET=${QINIU_BUCKET}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
-    volumes:
-      - ./data.db:/app/data.db
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
+
+  db:
+    image: postgres:16
+    container_name: qiniuyun-db
+    ports:
+      - "25432:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-qiniu_auth}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-qiniu_auth}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  pgdata:

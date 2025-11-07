@@ -68,47 +68,11 @@
 ## Docker 运行
 
 1. 拷贝 `.env.example` 为 `.env` 并填入实际配置。
-   - 数据库：`DATABASE_URL=sqlite:///./data.db`（项目根目录文件）
 2. 启动：
    ```bash
    docker compose up --build -d
    ```
-3. 数据持久化：SQLite 位于容器内 `/app/data.db`，通过卷映射到本地项目根的 `./data.db` 文件。
-   - 如果本地不存在 `data.db`，请先创建空文件（Windows PowerShell）：
-     ```powershell
-     New-Item -ItemType File -Path .\data.db | Out-Null
-     ```
-     或（cmd）：
-     ```cmd
-     type nul > data.db
-     ```
-4. 代理与镜像加速：
-   - 构建与容器内访问代理（可选）：在 `.env` 设置
-     - `HTTP_PROXY=http://your-proxy:port`
-     - `HTTPS_PROXY=http://your-proxy:port`
-     - `NO_PROXY=localhost,127.0.0.1`
-     `docker-compose.yml` 会将这些代理传入构建与运行环境，`pip` 等在构建阶段可使用代理。
-   - 拉取基础镜像加速（推荐）：使用 USTC 镜像源作为 Docker Hub 的注册表镜像。
-     - 方式一（Windows Docker Desktop）：
-       1) 打开 Docker Desktop → Settings → Docker Engine。
-       2) 在 JSON 中添加/修改：
-          ```json
-          {
-            "registry-mirrors": [
-              "https://docker.mirrors.ustc.edu.cn"
-            ]
-          }
-          ```
-       3) 点击 “Apply & Restart” 重启 Docker。
-     - 方式二（dockerd 使用 daemon.json）：将以下 JSON 保存到 `C:\ProgramData\Docker\config\daemon.json`，然后重启 Docker 服务：
-       ```json
-       {
-         "registry-mirrors": [
-           "https://docker.mirrors.ustc.edu.cn"
-         ]
-       }
-       ```
-     - 注意：注册表镜像仅对 Docker Hub 生效，其他注册表（如 GHCR、ECR）不受影响。
+3. 数据持久化：SQLite 位于容器内 `/app/data/data.db`，已通过卷映射到本地 `./data` 目录。
 
 ## 安全与生产建议
 
