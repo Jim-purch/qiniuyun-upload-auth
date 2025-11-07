@@ -1,0 +1,10 @@
+/* Minimal styles for admin pages (to be expanded later) */
+body { font-family: system-ui, Arial, sans-serif; margin: 0; padding: 0; }
+header { background: #1f2937; color: #fff; padding: 12px 16px; }
+main { padding: 16px; }
+table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+button, input[type="submit"] { background: #2563eb; color: white; border: none; padding: 8px 12px; cursor: pointer; }
+input, select { padding: 6px; border: 1px solid #ccc; border-radius: 4px; }
+form { display: grid; gap: 8px; max-width: 420px; }
+nav a { color: #fff; margin-right: 8px; text-decoration: none; }

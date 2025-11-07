@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block content %}
+  <h1>{{ title }}</h1>
+  <form method="post" action="{{ request.url.path }}">
+    <label>邮箱</label>
+    <input type="email" name="email" value="{{ user.email if user else '' }}" required />
+
+    <label>密码 {% if user %}(留空不修改){% endif %}</label>
+    <input type="password" name="password" />
+
+    <label>管理员</label>
+    <select name="is_admin">
+      <option value="false" {% if user and not user.is_admin %}selected{% endif %}>否</option>
+      <option value="true" {% if user and user.is_admin %}selected{% endif %}>是</option>
+    </select>
+
+    {% if user %}
+    <label>启用</label>
+    <select name="is_active">
+      <option value="true" {% if user and user.is_active %}selected{% endif %}>是</option>
+      <option value="false" {% if user and not user.is_active %}selected{% endif %}>否</option>
+    </select>
+    {% endif %}
+
+    <input type="submit" value="保存" />
+  </form>
+{% endblock %}
